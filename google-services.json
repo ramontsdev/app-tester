@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "29591486894",
+    "project_id": "pidigital-c3c13",
+    "storage_bucket": "pidigital-c3c13.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29591486894:android:83ae8aa6b76d4ae9d8c83f",
+        "android_client_info": {
+          "package_name": "br.gov.pi.pidigital"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "29591486894-6dtu589iku6vgke10sdfc94a71ho8smf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDD2Xo1Ja-Dpl2upFYqyurVTuFAz1Rmqnc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "29591486894-6dtu589iku6vgke10sdfc94a71ho8smf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "29591486894-2c5sv0l8qeigi2uqurir34j8o2tf2a3s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "br.gov.pi.pidigital"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

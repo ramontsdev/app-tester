@@ -1,0 +1,58 @@
+{
+	"arrowParens": "always",
+	"bracketSameLine": false,
+	"bracketSpacing": true,
+	"embeddedLanguageFormatting": "auto",
+	"endOfLine": "lf",
+	"htmlWhitespaceSensitivity": "css",
+	"importOrder": [
+		"<BUILTIN_MODULES>",
+		"^react$",
+		"^react/(.*)$",
+		"^react-native$",
+		"^react-native-(.*)$",
+		"^(.*)-react-native$",
+		"^expo$",
+		"^expo-(.*)$",
+		"<THIRD_PARTY_MODULES>",
+		"",
+		"<TYPES>",
+		"",
+		"^@/app$",
+		"^@/app/(.*)$",
+		"^@/screens$",
+		"^@/screens/(.*)$",
+		"^@/widgets$",
+		"^@/widgets/(.*)$",
+		"^@/features$",
+		"^@/features/(.*)$",
+		"^@/entities$",
+		"^@/entities/(.*)$",
+		"^@/shared$",
+		"^@/shared/(.*)$",
+		"",
+		"^[.]"
+	],
+	"importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+	"insertPragma": false,
+	"jsxSingleQuote": false,
+	"overrides": [
+		{
+			"files": ["**/*.json"],
+			"options": {
+				"useTabs": false
+			}
+		}
+	],
+	"plugins": ["@ianvs/prettier-plugin-sort-imports"],
+	"printWidth": 120,
+	"proseWrap": "always",
+	"quoteProps": "as-needed",
+	"requirePragma": false,
+	"semi": false,
+	"singleAttributePerLine": false,
+	"singleQuote": true,
+	"tabWidth": 2,
+	"trailingComma": "all",
+	"useTabs": true
+}

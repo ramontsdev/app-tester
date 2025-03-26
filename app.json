@@ -1,0 +1,145 @@
+{
+  "expo": {
+    "name": "Gov.pi Cidadão",
+    "slug": "gov_pi_cidadao",
+    "version": "1.0.67",
+    "orientation": "portrait",
+    "icon": "./src/shared/assets/images/icon.png",
+    "scheme": "pidigital",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "appStoreUrl": "https://apps.apple.com/in/app/gov-pi-cidadão/id6459582210",
+      "supportsTablet": false,
+      "bundleIdentifier": "br.gov.pi.pidigital",
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "UIRequiredDeviceCapabilities": ["armv7", "armv7"],
+        "NSCameraUsageDescription": "$(PRODUCT_NAME) quer ter acesso a sua câmera - Permita o acesso a sua câmera para escanear códigos QR e outras funcionalidades.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=br.gov.pi.pidigital",
+      "adaptiveIcon": {
+        "foregroundImage": "./src/shared/assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "br.gov.pi.pidigital",
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./src/shared/assets/images/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./src/shared/assets/fonts/Montserrat-Black.ttf",
+            "./src/shared/assets/fonts/Montserrat-Bold.ttf",
+            "./src/shared/assets/fonts/Montserrat-ExtraBold.ttf",
+            "./src/shared/assets/fonts/Montserrat-ExtraLight.ttf",
+            "./src/shared/assets/fonts/Montserrat-Light.ttf",
+            "./src/shared/assets/fonts/Montserrat-Medium.ttf",
+            "./src/shared/assets/fonts/Montserrat-Regular.ttf",
+            "./src/shared/assets/fonts/Montserrat-SemiBold.ttf",
+            "./src/shared/assets/fonts/Montserrat-Thin.ttf"
+          ]
+        }
+      ],
+      [
+        "expo-router",
+        {
+          "root": "./src/screens"
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": "$(PRODUCT_NAME) quer ter acesso aos dados do seu faceID - Habilite a biometria do seu celular para autenticar sua identidade."
+        }
+      ],
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "$(PRODUCT_NAME) quer ter acesso a sua câmera - Permita o acesso a sua câmera para escanear códigos QR e outras funcionalidades."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "$(PRODUCT_NAME) quer acessar sua localização - Permita o acesso a sua localização para exibir dados precisos sobre serviços e outras funcionalidades."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "$(PRODUCT_NAME) quer ter acesso aos dados do seu faceID - Habilite a biometria do seu celular para autenticar sua identidade."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 26,
+            "usesCleartextTraffic": true
+          },
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./src/shared/assets/images/notification-icon.png",
+          "color": "#FFFFFF",
+          "defaultChannel": "default"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "imageWidth": 176,
+          "image": "./src/shared/assets/images/new-logo.png",
+          "backgroundColor": "#F8F8F8",
+          "dark": {
+            "image": "./src/shared/assets/images/new-logo-white.png",
+            "backgroundColor": "#034EA2"
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false,
+        "root": "./src/screens"
+      },
+      "eas": {
+        "projectId": "f2c5866c-cab5-4558-87d8-89224712a541"
+      }
+    },
+    "owner": "etipi",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f2c5866c-cab5-4558-87d8-89224712a541"
+    }
+  }
+}
