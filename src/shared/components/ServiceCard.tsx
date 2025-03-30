@@ -2,16 +2,23 @@ import { useEffect, useState } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import { router } from 'expo-router'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faStar as faStarOutline } from '@fortawesome/free-regular-svg-icons'
-import { faCar, faDollar, faGraduationCap, faShieldHalved, faStar, faUser } from '@fortawesome/free-solid-svg-icons'
+import {
+	faCar,
+	faDollar,
+	faGraduationCap,
+	faShieldHalved,
+	faStar,
+	faStar as faStarOutline,
+	faUser,
+} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { TrueSheet } from '@lodev09/react-native-true-sheet'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { defaultTheme } from '@/app/styles/theme'
+import { favoriteEvents, FavoriteEventTypes } from '@/widgets/FavoriteServices/favoriteEvents'
 import { useOpenGlobalLoading } from '@/widgets/GlobalLoding'
 import { useIsSignedIn } from '@/features/authenticate/useIsSignedIn'
-import { useSetFavorite } from '@/entities/favorite'
 import { Service } from '@/entities/service/service.types'
 import { mmkvStorage } from '@/shared/lib/localStorage'
 import { cn } from '@/shared/utils/cn'
@@ -20,8 +27,7 @@ import { FavoriteErrorBottomSheet, FavoriteSuccessBottomSheet } from './BottomSh
 import { Text } from './Text'
 import { Touchable } from './Touchable'
 
-const importedIcons = [faCar, faGraduationCap, faDollar, faShieldHalved, faUser, faStar, faStarOutline]
-library.add(...importedIcons)
+library.add(faCar, faDollar, faGraduationCap, faShieldHalved, faUser, faStarOutline)
 
 const iconMap: { [key: string]: any } = {
 	'graduation-cap': faGraduationCap,
@@ -36,42 +42,32 @@ interface ServiceCardProps {
 	className?: string
 	isFavorite?: boolean
 }
-const FAVORITE_UPDATE_INTERVAL = 500
 
-function parseFavorites(favorites: string | undefined | null): string[] {
+function parseFavorites(favorites?: string | null): string[] {
 	if (!favorites) return []
 	try {
 		const parsed = JSON.parse(favorites)
 		if (Array.isArray(parsed)) {
-			return parsed.filter((item): item is string => typeof item === 'string')
+			return parsed.filter((item: unknown): item is string => typeof item === 'string')
 		}
 		return []
 	} catch {
 		return []
 	}
 }
-
 export function ServiceCard({ data, className = '', isFavorite = false }: ServiceCardProps) {
 	const isSignedIn = useIsSignedIn()
 	const [isStarred, setIsStarred] = useState(false)
-	const setFavorite = useSetFavorite()
 	const queryClient = useQueryClient()
 	const iconName = data.icon.slice(3)
 	const globalLoding = useOpenGlobalLoading()
 
+	const favorites = mmkvStorage.getString('favorites')
+	const favoritesList = parseFavorites(favorites)
+
 	useEffect(() => {
-		const updateStarState = () => {
-			const favorites = mmkvStorage.getString('favorites')
-			const favoritesList = parseFavorites(favorites)
-			setIsStarred(favoritesList.includes(data.slug))
-		}
-
-		updateStarState()
-
-		const interval = setInterval(updateStarState, FAVORITE_UPDATE_INTERVAL)
-
-		return () => clearInterval(interval)
-	}, [data.slug])
+		setIsStarred(favoritesList.includes(data.slug))
+	}, [favoritesList, data.slug])
 
 	function handlePress() {
 		if (isSignedIn) {
@@ -93,7 +89,6 @@ export function ServiceCard({ data, className = '', isFavorite = false }: Servic
 
 	function handleFavoritePress() {
 		const newState = !isStarred
-
 		setIsStarred(newState)
 
 		try {
@@ -110,6 +105,8 @@ export function ServiceCard({ data, className = '', isFavorite = false }: Servic
 
 			mmkvStorage.set('favorites', JSON.stringify(favoritesList))
 
+			favoriteEvents.emit(FavoriteEventTypes.UPDATED)
+
 			queryClient.setQueryData(['services', 'favorites'], {
 				success: true,
 				data: favoritesList,
@@ -119,43 +116,6 @@ export function ServiceCard({ data, className = '', isFavorite = false }: Servic
 			setIsStarred(!newState)
 			TrueSheet.present('favorite-error')
 		}
-
-		setFavorite.mutate(
-			{
-				slug: data.slug,
-				remove: !newState,
-			},
-			{
-				onSuccess: () => {
-					TrueSheet.present('favorite-success')
-				},
-				onError: () => {
-					setIsStarred(!newState)
-
-					try {
-						const favorites = mmkvStorage.getString('favorites')
-						let favoritesList = parseFavorites(favorites)
-
-						if (!newState) {
-							if (!favoritesList.includes(data.slug)) {
-								favoritesList.push(data.slug)
-							}
-						} else {
-							favoritesList = favoritesList.filter((slug) => slug !== data.slug)
-						}
-
-						mmkvStorage.set('favorites', JSON.stringify(favoritesList))
-						queryClient.setQueryData(['services', 'favorites'], {
-							success: true,
-							data: favoritesList,
-						})
-					} catch (error) {
-						console.error('Erro ao reverter favoritos:', error)
-						TrueSheet.present('favorite-error')
-					}
-				},
-			},
-		)
 	}
 
 	function goToService(uri: string, name: string, slug: string, icon: string, category?: string) {
@@ -171,6 +131,20 @@ export function ServiceCard({ data, className = '', isFavorite = false }: Servic
 		})
 	}
 
+	useEffect(() => {
+		function handleFavoriteUpdated() {
+			const favorites = mmkvStorage.getString('favorites')
+			const favoritesList = parseFavorites(favorites)
+			setIsStarred(favoritesList.includes(data.slug))
+		}
+
+		favoriteEvents.on(FavoriteEventTypes.UPDATED, handleFavoriteUpdated)
+
+		return () => {
+			favoriteEvents.off(FavoriteEventTypes.UPDATED, handleFavoriteUpdated)
+		}
+	}, [data.slug])
+
 	return (
 		<>
 			<Touchable
@@ -182,7 +156,7 @@ export function ServiceCard({ data, className = '', isFavorite = false }: Servic
 			>
 				<View className="flex flex-row justify-between items-center">
 					<View className="w-7 h-7 rounded-md justify-center items-center bg-primary-100">
-						<FontAwesomeIcon icon={iconMap[iconName] || faUser} size={17} color={defaultTheme.colors.primary[800]} />
+						<FontAwesomeIcon icon={iconMap[iconName] ?? faUser} size={17} color={defaultTheme.colors.primary[800]} />
 					</View>
 
 					{isSignedIn && (
