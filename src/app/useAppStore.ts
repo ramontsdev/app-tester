@@ -13,6 +13,9 @@ type AppStore = {
 	setIsAnimatedSplashVisible: (isAnimatedSplashVisible: boolean) => void
 	isLoggedNow: boolean
 	setIsLoggedNow: (setIsLoggedNow: boolean) => void
+
+	servicesFavoritesSlugs: string[]
+	setServicesFavoritesSlugs: (servicesFavoritesSlugs: string[]) => void
 }
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -28,4 +31,7 @@ export const useAppStore = create<AppStore>((set) => ({
 	setIsAnimatedSplashVisible: (isAnimatedSplashVisible: boolean) => set({ isAnimatedSplashVisible }),
 	isLoggedNow: false,
 	setIsLoggedNow: (isLoggedNow: boolean) => set({ isLoggedNow }),
+
+	servicesFavoritesSlugs: [],
+	setServicesFavoritesSlugs: (servicesFavoritesSlugs: string[]) => set({ servicesFavoritesSlugs }),
 }))

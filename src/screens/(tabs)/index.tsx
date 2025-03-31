@@ -8,7 +8,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { isArray, isEmpty } from 'radash'
 
 import { useAppStore } from '@/app/useAppStore'
-import { FavoriteServices } from '@/widgets/FavoriteServices'
+import { MemoizedFavoriteServices } from '@/widgets/FavoriteServices'
 import { useGlobalLoadingStore } from '@/widgets/GlobalLoding'
 import { MostAccessedServices } from '@/widgets/MostAccessedServices'
 import { RecentServices } from '@/widgets/RecentServices'
@@ -210,7 +210,7 @@ export default function InitialScreen() {
 
 							{isSignedIn && (
 								<>
-									<FavoriteServices />
+									<MemoizedFavoriteServices />
 									<ServicesNeedToday />
 
 									{shouldShowLevelUpgradeButton && <LevelUpgradeButton onPress={handleLevelUpgradePress} />}

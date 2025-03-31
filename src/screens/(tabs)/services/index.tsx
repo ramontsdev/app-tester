@@ -2,7 +2,7 @@ import { ScrollView, View } from 'react-native'
 import { Stack } from 'expo-router'
 
 import { Departments } from '@/widgets/Departments'
-import { FavoriteServices } from '@/widgets/FavoriteServices'
+import { MemoizedFavoriteServices } from '@/widgets/FavoriteServices'
 import { SearchServicesInput } from '@/widgets/SearchServicesInput'
 import { ServiceByCategory } from '@/widgets/ServiceByCategory'
 import { ServicesNeedToday } from '@/widgets/ServicesNeedToday'
@@ -17,7 +17,7 @@ export default function Services() {
 					<SearchServicesInput />
 				</View>
 
-				<FavoriteServices />
+				<MemoizedFavoriteServices />
 
 				<ServicesNeedToday />
 

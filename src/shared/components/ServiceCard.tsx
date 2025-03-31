@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import { router } from 'expo-router'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -12,15 +11,13 @@ import {
 	faUser,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { TrueSheet } from '@lodev09/react-native-true-sheet'
-import { useQueryClient } from '@tanstack/react-query'
 
 import { defaultTheme } from '@/app/styles/theme'
-import { favoriteEvents, FavoriteEventTypes } from '@/widgets/FavoriteServices/favoriteEvents'
+import { useAppStore } from '@/app/useAppStore'
+import { favoriteEvents, FavoriteEventsType } from '@/widgets/FavoriteServices/favoriteEvents'
 import { useOpenGlobalLoading } from '@/widgets/GlobalLoding'
 import { useIsSignedIn } from '@/features/authenticate/useIsSignedIn'
 import { Service } from '@/entities/service/service.types'
-import { mmkvStorage } from '@/shared/lib/localStorage'
 import { cn } from '@/shared/utils/cn'
 
 import { FavoriteErrorBottomSheet, FavoriteSuccessBottomSheet } from './BottomSheets'
@@ -43,31 +40,25 @@ interface ServiceCardProps {
 	isFavorite?: boolean
 }
 
-function parseFavorites(favorites?: string | null): string[] {
-	if (!favorites) return []
-	try {
-		const parsed = JSON.parse(favorites)
-		if (Array.isArray(parsed)) {
-			return parsed.filter((item: unknown): item is string => typeof item === 'string')
-		}
-		return []
-	} catch {
-		return []
-	}
-}
-export function ServiceCard({ data, className = '', isFavorite = false }: ServiceCardProps) {
+export function ServiceCard({ data, className = '' }: ServiceCardProps) {
 	const isSignedIn = useIsSignedIn()
-	const [isStarred, setIsStarred] = useState(false)
-	const queryClient = useQueryClient()
 	const iconName = data.icon.slice(3)
-	const globalLoding = useOpenGlobalLoading()
+	const globalLoading = useOpenGlobalLoading()
 
-	const favorites = mmkvStorage.getString('favorites')
-	const favoritesList = parseFavorites(favorites)
+	const { servicesFavoritesSlugs } = useAppStore()
 
-	useEffect(() => {
-		setIsStarred(favoritesList.includes(data.slug))
-	}, [favoritesList, data.slug])
+	const isFavorite = servicesFavoritesSlugs.includes(data.slug)
+
+	function handleFavoritePress() {
+		if (!isSignedIn) {
+			return
+		}
+		if (isFavorite) {
+			favoriteEvents.emit(FavoriteEventsType.REMOVE, data.slug)
+		} else {
+			favoriteEvents.emit(FavoriteEventsType.ADD, data.slug)
+		}
+	}
 
 	function handlePress() {
 		if (isSignedIn) {
@@ -87,39 +78,8 @@ export function ServiceCard({ data, className = '', isFavorite = false }: Servic
 		})
 	}
 
-	function handleFavoritePress() {
-		const newState = !isStarred
-		setIsStarred(newState)
-
-		try {
-			const favorites = mmkvStorage.getString('favorites')
-			let favoritesList = parseFavorites(favorites)
-
-			if (newState) {
-				if (!favoritesList.includes(data.slug)) {
-					favoritesList.push(data.slug)
-				}
-			} else {
-				favoritesList = favoritesList.filter((slug) => slug !== data.slug)
-			}
-
-			mmkvStorage.set('favorites', JSON.stringify(favoritesList))
-
-			favoriteEvents.emit(FavoriteEventTypes.UPDATED)
-
-			queryClient.setQueryData(['services', 'favorites'], {
-				success: true,
-				data: favoritesList,
-			})
-		} catch (error) {
-			console.error('Erro ao atualizar favoritos:', error)
-			setIsStarred(!newState)
-			TrueSheet.present('favorite-error')
-		}
-	}
-
 	function goToService(uri: string, name: string, slug: string, icon: string, category?: string) {
-		globalLoding.openGlobalLoading([`Acessando serviço ${name}`, 'Aguarde'], {
+		globalLoading.openGlobalLoading([`Acessando serviço ${name}`, 'Aguarde'], {
 			nextRoute: '/service/webView',
 			routeParams: {
 				uri,
@@ -130,20 +90,6 @@ export function ServiceCard({ data, className = '', isFavorite = false }: Servic
 			},
 		})
 	}
-
-	useEffect(() => {
-		function handleFavoriteUpdated() {
-			const favorites = mmkvStorage.getString('favorites')
-			const favoritesList = parseFavorites(favorites)
-			setIsStarred(favoritesList.includes(data.slug))
-		}
-
-		favoriteEvents.on(FavoriteEventTypes.UPDATED, handleFavoriteUpdated)
-
-		return () => {
-			favoriteEvents.off(FavoriteEventTypes.UPDATED, handleFavoriteUpdated)
-		}
-	}, [data.slug])
 
 	return (
 		<>
@@ -162,9 +108,9 @@ export function ServiceCard({ data, className = '', isFavorite = false }: Servic
 					{isSignedIn && (
 						<TouchableOpacity activeOpacity={0.5} onPress={handleFavoritePress} className="justify-center items-center">
 							<FontAwesomeIcon
-								icon={isStarred ? faStar : faStarOutline}
+								icon={isFavorite ? faStar : faStarOutline}
 								size={25}
-								color={isStarred ? '#F59E0B' : '#9CA3AF'}
+								color={isFavorite ? '#F59E0B' : '#9CA3AF'}
 							/>
 						</TouchableOpacity>
 					)}
