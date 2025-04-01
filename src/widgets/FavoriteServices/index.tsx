@@ -12,8 +12,6 @@ import { ServiceCard } from '@/shared/components/ServiceCard'
 import { favoriteEvents, FavoriteEventsType } from './favoriteEvents'
 import { parseFavorites } from './favoriteUtils'
 
-let count = 0
-
 export function FavoriteServices() {
 	const isSignedIn = useIsSignedIn()
 	const {
@@ -42,7 +40,7 @@ export function FavoriteServices() {
 	const { mutateAsync } = useSetFavoriteServiceMutation()
 
 	useEffect(() => {
-		async function handleFavoriteAdd(slug: string) {
+		async function addFavorite(slug: string) {
 			try {
 				setServicesFavoritesSlugs([...servicesFavoritesSlugs, slug])
 				await mutateAsync({ slug, isFavorite: true })
@@ -51,7 +49,7 @@ export function FavoriteServices() {
 			}
 		}
 
-		async function handleFavoriteRemove(slug: string) {
+		async function removeFavorite(slug: string) {
 			try {
 				setServicesFavoritesSlugs(servicesFavoritesSlugs.filter((prevSlug) => prevSlug !== slug))
 				await mutateAsync({ slug, isFavorite: false })
@@ -60,20 +58,18 @@ export function FavoriteServices() {
 			}
 		}
 
-		favoriteEvents.on(FavoriteEventsType.ADD, handleFavoriteAdd)
-		favoriteEvents.on(FavoriteEventsType.REMOVE, handleFavoriteRemove)
+		favoriteEvents.on(FavoriteEventsType.ADD, addFavorite)
+		favoriteEvents.on(FavoriteEventsType.REMOVE, removeFavorite)
 
 		return () => {
-			favoriteEvents.off(FavoriteEventsType.ADD, handleFavoriteAdd)
-			favoriteEvents.off(FavoriteEventsType.REMOVE, handleFavoriteRemove)
+			favoriteEvents.off(FavoriteEventsType.ADD, addFavorite)
+			favoriteEvents.off(FavoriteEventsType.REMOVE, removeFavorite)
 		}
 	}, [mutateAsync, servicesFavoritesSlugs, setServicesFavoritesSlugs])
 
 	if (!isSignedIn || isError || !isFetched) {
 		return null
 	}
-
-	console.log(`Renderizou ${++count} vezes`)
 
 	return (
 		<View className="gap-4">
